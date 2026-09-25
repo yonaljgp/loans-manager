@@ -20,7 +20,7 @@ function syncLoansWithCurrentDate(loans: LoanType[]): {
 
     const updatedInterests = generateInterestsUpToDate({
       startDate: loan.paymentDate,
-      amount: loan.amount,
+      amount: loan.capitalAmount,
       interestPercentage: loan.interestPercentage,
       period: loan.period,
       existingInterests: loan.interests ?? [],
@@ -141,7 +141,7 @@ function addLoan(key: string, loan: Omit<LoanType, "id">): LoanType {
       ? loan.interests
       : generateInterestsUpToDate({
           startDate: loan.paymentDate,
-          amount: loan.amount,
+          amount: loan.capitalAmount,
           interestPercentage: loan.interestPercentage,
           period: loan.period,
           loanId,

@@ -77,7 +77,7 @@ export default function ModalInterests({
         <div className="flex flex-col">
           <span className="text-base font-bold">Control de Intereses</span>
           <span className="text-xs text-neutral-500">
-            {loan.name} • {formatCurrency(loan.amount)} • {loan.period}
+            {loan.name} • {formatCurrency(loan.capitalAmount)} • {loan.period}
           </span>
         </div>
       }

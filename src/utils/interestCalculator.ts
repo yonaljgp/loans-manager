@@ -147,7 +147,7 @@ export function syncLoanInterests(
 ): LoanType {
   const updatedInterests = generateInterestsUpToDate({
     startDate: loan.paymentDate,
-    amount: loan.amount,
+    amount: loan.capitalAmount,
     interestPercentage: loan.interestPercentage,
     period: loan.period,
     existingInterests: loan.interests ?? [],
@@ -168,7 +168,7 @@ export function generateNextInterestWeek(loan: LoanType): InterestType {
   const currentInterests = loan.interests ?? [];
   const nextWeekNumber = currentInterests.length + 1;
   const weeklyAmount = calculateInterestAmount(
-    loan.amount,
+    loan.capitalAmount - (loan.principalPayment || 0),
     loan.interestPercentage,
   );
 

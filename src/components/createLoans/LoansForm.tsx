@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 
 const schema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  amount: z.number().min(1, "El monto debe ser mayor 0"),
+  capitalAmount: z.number().min(1, "El monto debe ser mayor 0"),
   interestPercentage: z
     .string()
     // 1. Evita que escriban letras (solo permite números, opcionalmente un punto/coma decimal y el signo %)
@@ -48,7 +48,7 @@ function LoansForm() {
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
-      amount: 0,
+      capitalAmount: 0,
       interestPercentage: "0%",
       period: "semanal",
       paymentDate: "",
@@ -81,7 +81,7 @@ function LoansForm() {
         {errors.name && <span>{errors.name.message}</span>}
 
         <Controller
-          name="amount"
+          name="capitalAmount"
           control={control}
           render={({ field }) => (
             <NumberInput
@@ -98,7 +98,7 @@ function LoansForm() {
             />
           )}
         />
-        {errors.amount && <span>{errors.amount.message}</span>}
+        {errors.capitalAmount && <span>{errors.capitalAmount.message}</span>}
 
         <TextInput
           label="Tasa de Interes"

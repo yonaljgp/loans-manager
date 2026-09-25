@@ -12,7 +12,7 @@ export type LoanType = {
   id: number;
   name: string;
   capitalAmount: number;
-  principalPayment: number;
+  principalPayment?: number;
   interestPercentage: number;
   period: "semanal" | "quincenal" | "mensual";
   paymentDate: string;

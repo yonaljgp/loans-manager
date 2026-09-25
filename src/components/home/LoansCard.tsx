@@ -120,8 +120,8 @@ function LoansCard({ loans }: LoansCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {loans.map((loan) => {
             const interestVal =
-              (loan.amount * (loan.interestPercentage || 0)) / 100;
-            const totalAmount = loan.amount + interestVal;
+              (loan.capitalAmount * (loan.interestPercentage || 0)) / 100;
+            const totalAmount = loan.capitalAmount + interestVal;
             const isPaid = loan.status === "pagado";
             const interests = loan.interests ?? [];
             const paidInterestsCount = interests.filter((i) => i.paid).length;
@@ -205,7 +205,7 @@ function LoansCard({ loans }: LoansCardProps) {
                   </div>
 
                   <div className="text-2xl font-extrabold tracking-tight">
-                    {formatCurrency(loan.amount)}
+                    {formatCurrency(loan.capitalAmount)}
                   </div>
 
                   <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between text-xs">
