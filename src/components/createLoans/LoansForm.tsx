@@ -8,30 +8,21 @@ import { Select, TextInput, NumberInput, Card, Button } from "@mantine/core";
 import { addLoan } from "@/utils/LocalStorage";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import "dayjs/locale/es";
 
 const schema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
   capitalAmount: z.number().min(1, "El monto debe ser mayor 0"),
   interestPercentage: z
-    .string()
-    // 1. Evita que escriban letras (solo permite números, opcionalmente un punto/coma decimal y el signo %)
-    .regex(/^[0-9.,]*%?$/, { message: "Solo se permiten números" })
-
-    // 2. Transforma el texto a número para la base de datos o estado
-    .transform((val) => {
-      const numeroLimpio = val.replace("%", "").replace(",", ".").trim();
-      return numeroLimpio === "" ? 0 : Number(numeroLimpio);
-    })
-
-    // 3. Valida el número resultante
-    .pipe(
-      z
-        .number()
-        .min(0, { message: "El porcentaje mínimo es 0%" })
-        .max(100, { message: "El porcentaje máximo es 100%" }),
-    ),
-  period: z.enum(["semanal", "quincenal", "mensual"]),
+    .number()
+    .min(0, "El interes debe ser mayor a 0")
+    .max(100, "El interes debe ser menor a 100"),
+  period: z.enum(["Semanal", "Quincenal", "Mensual"]),
   paymentDate: z.string().min(1, "La fecha es requerida"),
+  note: z
+    .string()
+    .max(200, "La nota debe tener máximo 200 caracteres")
+    .optional(),
 });
 
 type FormInput = z.input<typeof schema>;
@@ -49,9 +40,10 @@ function LoansForm() {
     defaultValues: {
       name: "",
       capitalAmount: 0,
-      interestPercentage: "0%",
-      period: "semanal",
+      interestPercentage: 0,
+      period: "Semanal",
       paymentDate: "",
+      note: "",
     },
   });
 
@@ -76,7 +68,7 @@ function LoansForm() {
           label="Nombre"
           required
           {...register("name")}
-          placeholder="ej. Juan Perez"
+          placeholder="Juan Perez"
         />
         {errors.name && <span>{errors.name.message}</span>}
 
@@ -88,7 +80,7 @@ function LoansForm() {
               label="Monto"
               placeholder="100$"
               required
-              prefix="$"
+              suffix="$"
               hideControls
               value={field.value}
               onChange={(val) =>
@@ -100,11 +92,24 @@ function LoansForm() {
         />
         {errors.capitalAmount && <span>{errors.capitalAmount.message}</span>}
 
-        <TextInput
-          label="Tasa de Interes"
-          required
-          {...register("interestPercentage")}
-          placeholder="20%"
+        <Controller
+          name="interestPercentage"
+          control={control}
+          render={({ field }) => (
+            <NumberInput
+              label="Tasa de Interés"
+              placeholder="20"
+              required
+              suffix="%"
+              hideControls
+              value={field.value}
+              onChange={(val) =>
+                field.onChange(typeof val === "number" ? val : 0)
+              }
+              min={0}
+              max={100}
+            />
+          )}
         />
         {errors.interestPercentage && (
           <span>{errors.interestPercentage.message}</span>
@@ -118,9 +123,9 @@ function LoansForm() {
               label="Periodo de Pago"
               required
               rightSection={null}
-              data={["semanal", "quincenal", "mensual"]}
+              data={["Semanal", "Quincenal", "Mensual"]}
               value={field.value}
-              onChange={(val) => field.onChange(val ?? "semanal")}
+              onChange={(val) => field.onChange(val ?? "Semanal")}
             />
           )}
         />
@@ -134,6 +139,7 @@ function LoansForm() {
               label="Fecha de Inicio"
               placeholder="12/10/2022"
               maxDate={new Date()}
+              locale="es"
               required
               value={field.value ? new Date(field.value) : null}
               onChange={(date) => {
@@ -150,6 +156,14 @@ function LoansForm() {
           )}
         />
         {errors.paymentDate && <span>{errors.paymentDate.message}</span>}
+
+        <TextInput
+          label="Nota"
+          {...register("note")}
+          placeholder="Préstamo para estudios"
+          maxLength={200}
+        />
+        {errors.note && <span>{errors.note.message}</span>}
 
         <Button type="submit">Enviar</Button>
       </form>

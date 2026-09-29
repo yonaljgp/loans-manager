@@ -19,11 +19,11 @@ export function getPeriodLabel(
   count: number = 1,
 ): string {
   switch (period) {
-    case "quincenal":
+    case "Quincenal":
       return count === 1 ? "Quincena" : "Quincenas";
-    case "mensual":
+    case "Mensual":
       return count === 1 ? "Mes" : "Meses";
-    case "semanal":
+    case "Semanal":
     default:
       return count === 1 ? "Semana" : "Semanas";
   }
@@ -50,7 +50,7 @@ export function generateInterestsUpToDate({
   startDate,
   amount,
   interestPercentage,
-  period = "semanal",
+  period = "Semanal",
   existingInterests = [],
   targetDate,
   loanId,
@@ -77,9 +77,9 @@ export function generateInterestsUpToDate({
   while (keepGoing) {
     let nextDate = baseDate;
 
-    if (period === "quincenal") {
+    if (period === "Quincenal") {
       nextDate = baseDate.add(step * 14, "day");
-    } else if (period === "mensual") {
+    } else if (period === "Mensual") {
       nextDate = baseDate.add(step, "month");
     } else {
       // Semanal: cada 7 días
@@ -177,17 +177,17 @@ export function generateNextInterestWeek(loan: LoanType): InterestType {
   if (currentInterests.length > 0) {
     const lastInterest = currentInterests[currentInterests.length - 1];
     const lastDate = dayjs(lastInterest.paymentDate);
-    if (loan.period === "quincenal") {
+    if (loan.period === "Quincenal") {
       nextDate = lastDate.add(14, "day");
-    } else if (loan.period === "mensual") {
+    } else if (loan.period === "Mensual") {
       nextDate = lastDate.add(1, "month");
     } else {
       nextDate = lastDate.add(7, "day");
     }
   } else {
-    if (loan.period === "quincenal") {
+    if (loan.period === "Quincenal") {
       nextDate = nextDate.add(14, "day");
-    } else if (loan.period === "mensual") {
+    } else if (loan.period === "Mensual") {
       nextDate = nextDate.add(1, "month");
     } else {
       nextDate = nextDate.add(7, "day");

@@ -26,6 +26,10 @@ function CardSummary({ loans }: Props) {
     (acc, loan) => acc + (loan.capitalAmount || 0),
     0,
   );
+  const totalInstallmentsPending = pendingLoans.reduce(
+    (acc, loan) => acc + (loan.interests?.length || 0),
+    0,
+  );
 
   const paidLoans = loans.filter((l) => l.status === "pagado");
   const totalInterestsPending = pendingLoans.reduce((acc, loan) => {
@@ -44,10 +48,10 @@ function CardSummary({ loans }: Props) {
       icon: Wallet,
       badgeText: "Cartera Total",
       badgeColor: "blue",
-      colorClass: "text-blue-600 dark:text-blue-400",
-      bgClass: "bg-linear-to-br from-blue-500/15 to-blue-600/5",
-      borderClass: "border-blue-500/20",
-      hoverBorder: "hover:border-blue-500/50",
+      colorClass: "text-bg-active",
+      bgClass: "bg-bg-active/15",
+      borderClass: "border-bg-active/20",
+      hoverBorder: "hover:border-bg-active/50",
     },
     {
       title: "Por Cobrar",
@@ -56,22 +60,22 @@ function CardSummary({ loans }: Props) {
       icon: Clock,
       badgeText: "En curso",
       badgeColor: "amber",
-      colorClass: "text-amber-600 dark:text-amber-400",
-      bgClass: "bg-linear-to-br from-amber-500/15 to-amber-600/5",
-      borderClass: "border-amber-500/20",
-      hoverBorder: "hover:border-amber-500/50",
+      colorClass: "text-amber",
+      bgClass: "bg-amber/15",
+      borderClass: "border-amber/20",
+      hoverBorder: "hover:border-amber/50",
     },
     {
       title: "Intereses Pendientes",
       amount: totalInterestsPending,
-      subtitle: ` Cuotas Pendientes`,
+      subtitle: `${totalInstallmentsPending} Cuotas Pendientes`,
       icon: CheckCircle2,
       badgeText: `${paidLoans.length} saldados`,
-      badgeColor: "emerald",
-      colorClass: "text-emerald-600 dark:text-emerald-400",
-      bgClass: "bg-linear-to-br from-emerald-500/15 to-emerald-600/5",
-      borderClass: "border-emerald-500/20",
-      hoverBorder: "hover:border-emerald-500/50",
+      badgeColor: "blue",
+      colorClass: "text-bg-active",
+      bgClass: "bg-bg-active/10",
+      borderClass: "border-bg-active/20",
+      hoverBorder: "hover:border-bg-active/50",
     },
   ];
 

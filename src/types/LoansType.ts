@@ -14,7 +14,7 @@ export type LoanType = {
   capitalAmount: number;
   principalPayment?: number;
   interestPercentage: number;
-  period: "semanal" | "quincenal" | "mensual";
+  period: "Semanal" | "Quincenal" | "Mensual";
   paymentDate: string;
   status?: "pendiente" | "pagado";
   weeksCount?: number;

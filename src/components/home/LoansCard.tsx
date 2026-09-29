@@ -6,16 +6,16 @@ import {
   Calendar,
   Clock,
   Trash2,
-  TrendingUp,
   User,
   CheckCircle2,
   AlertCircle,
   Coins,
+  Wallet,
 } from "lucide-react";
 import type { LoanType } from "@/types/LoansType";
-import { getPeriodLabel } from "@/utils/interestCalculator";
 import ModalDelete from "./ModalDelete";
-import ModalInterests from "./ModalInterests";
+import ModalLoans from "./ModalLoans";
+import ModalPayCapital from "./ModalPayCapital";
 import { useDisclosure } from "@mantine/hooks";
 
 type LoansCardProps = {
@@ -65,27 +65,18 @@ function getInitials(name: string): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-function getPeriodColor(period: LoanType["period"]) {
-  switch (period) {
-    case "semanal":
-      return "blue";
-    case "quincenal":
-      return "indigo";
-    case "mensual":
-      return "violet";
-    default:
-      return "gray";
-  }
-}
-
 function LoansCard({ loans }: LoansCardProps) {
   const [openedDelete, { open: openDelete, close: closeDelete }] =
     useDisclosure(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const [openedInterests, { open: openInterests, close: closeInterests }] =
+  const [openedModal, { open: openModal, close: closeModal }] =
     useDisclosure(false);
-  const [selectedLoanForInterests, setSelectedLoanForInterests] =
+  const [selectedLoan, setSelectedLoan] = useState<LoanType | null>(null);
+
+  const [openedCapital, { open: openCapital, close: closeCapital }] =
+    useDisclosure(false);
+  const [selectedCapitalLoan, setSelectedCapitalLoan] =
     useState<LoanType | null>(null);
 
   const handleOpenDelete = (id: number) => {
@@ -98,51 +89,71 @@ function LoansCard({ loans }: LoansCardProps) {
     closeDelete();
   };
 
-  const handleOpenInterests = (loan: LoanType) => {
-    setSelectedLoanForInterests(loan);
-    openInterests();
+  const handleOpenModal = (loan: LoanType) => {
+    setSelectedLoan(loan);
+    openModal();
   };
 
-  const handleCloseInterests = () => {
-    setSelectedLoanForInterests(null);
-    closeInterests();
+  const handleCloseModal = () => {
+    setSelectedLoan(null);
+    closeModal();
   };
 
-  // Keep selectedLoanForInterests synchronized if loans list updates
-  const activeLoanForInterests = selectedLoanForInterests
-    ? (loans.find((l) => l.id === selectedLoanForInterests.id) ??
-      selectedLoanForInterests)
+  const handleOpenCapital = (loan: LoanType) => {
+    setSelectedCapitalLoan(loan);
+    openCapital();
+  };
+
+  const handleCloseCapital = () => {
+    setSelectedCapitalLoan(null);
+    closeCapital();
+  };
+
+  // Mantener sincronizado si la lista de préstamos se actualiza
+  const activeLoan = selectedLoan
+    ? (loans.find((l) => l.id === selectedLoan.id) ?? selectedLoan)
+    : null;
+
+  const activeCapitalLoan = selectedCapitalLoan
+    ? (loans.find((l) => l.id === selectedCapitalLoan.id) ??
+      selectedCapitalLoan)
     : null;
 
   return (
     <>
-      <div className="w-full max-w-6xl ">
+      <div className="w-full max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {loans.map((loan) => {
-            const interestVal =
-              (loan.capitalAmount * (loan.interestPercentage || 0)) / 100;
-            const totalAmount = loan.capitalAmount + interestVal;
             const isPaid = loan.status === "pagado";
             const interests = loan.interests ?? [];
             const paidInterestsCount = interests.filter((i) => i.paid).length;
             const totalInterestsCount = interests.length;
+            const currentPaidCapital = loan.principalPayment || 0;
+            const remainingCapital = Math.max(
+              0,
+              loan.capitalAmount - currentPaidCapital,
+            );
 
             return (
               <div
                 key={loan.id}
-                className="card group relative flex flex-col justify-between p-6 rounded-2xl border hover:border-blue-500/50 hover:shadow-lg transition-all duration-300"
+                className="card group relative flex flex-col justify-between p-5 rounded-2xl border hover:border-blue-500/40 hover:shadow-md transition-all duration-200"
               >
-                {/* Encabezado: Cliente y Acciones */}
+                {/* Cabecera: Iniciales, Nombre, ID, Estado y Eliminar */}
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-linear-to-br from-blue-500/15 to-blue-600/5 text-blue-600 dark:text-blue-400 font-bold text-sm border border-blue-500/20 shrink-0">
+                    <div
+                      onClick={() => handleOpenModal(loan)}
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm border border-blue-500/20 shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                    >
                       {getInitials(loan.name)}
                     </div>
                     <div className="min-w-0">
                       <Title
                         order={3}
-                        className="text-base font-bold truncate group-hover:text-blue-500 transition-colors"
+                        className="text-base font-bold truncate group-hover:text-blue-500 transition-colors cursor-pointer"
                         title={loan.name}
+                        onClick={() => handleOpenModal(loan)}
                       >
                         {loan.name}
                       </Title>
@@ -158,7 +169,7 @@ function LoansCard({ loans }: LoansCardProps) {
                   <div className="flex items-center gap-1">
                     <Badge
                       variant="light"
-                      color={isPaid ? "green" : "amber"}
+                      color={isPaid ? "blue" : "amber"}
                       size="sm"
                       radius="md"
                       leftSection={
@@ -179,7 +190,7 @@ function LoansCard({ loans }: LoansCardProps) {
                         size="sm"
                         radius="md"
                         onClick={() => handleOpenDelete(loan.id)}
-                        className="opacity-60 group-hover:opacity-100 transition-opacity hover:bg-red-500/10"
+                        className="opacity-50 hover:opacity-100 transition-opacity hover:bg-red-500/10"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </ActionIcon>
@@ -187,11 +198,21 @@ function LoansCard({ loans }: LoansCardProps) {
                   </div>
                 </div>
 
-                {/* Contenido Principal: Monto e Interés */}
-                <div className="card my-4 p-4 ">
-                  <div className="flex items-baseline justify-between mb-1">
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                {/* Monto de Capital e Interés */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
                       Monto prestado
+                    </span>
+                    {currentPaidCapital > 0 && (
+                      <span className="text-[11px] text-amber font-semibold">
+                        Saldo: {formatCurrency(remainingCapital)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-2xl font-extrabold tracking-tight">
+                      {formatCurrency(loan.capitalAmount)}
                     </span>
                     <Badge
                       variant="outline"
@@ -200,53 +221,25 @@ function LoansCard({ loans }: LoansCardProps) {
                       radius="sm"
                       className="font-medium"
                     >
-                      +{loan.interestPercentage}% interés
+                      {loan.interestPercentage}% interés
                     </Badge>
                   </div>
-
-                  <div className="text-2xl font-extrabold tracking-tight">
-                    {formatCurrency(loan.capitalAmount)}
-                  </div>
-
-                  <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between text-xs">
-                    <span className="text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-                      <TrendingUp className="w-3.5 h-3.5 text-green-500" />
-                      Total a cobrar:
-                    </span>
-                    <span className="font-bold">
-                      {formatCurrency(totalAmount)}
-                    </span>
-                  </div>
                 </div>
 
-                {/* Semanas / Cuotas de Intereses */}
-                <div className="mb-4">
-                  <Button
-                    variant="light"
-                    color="blue"
-                    fullWidth
-                    size="xs"
-                    radius="md"
-                    leftSection={<Coins className="w-3.5 h-3.5" />}
-                    onClick={() => handleOpenInterests(loan)}
-                  >
-                    Ver {getPeriodLabel(loan.period, 2)} ({paidInterestsCount}/
-                    {totalInterestsCount || 0} cobradas)
-                  </Button>
-                </div>
-
-                {/* Pie de Tarjeta: Plazo y Fecha de Inicio */}
-                <div className="mt-auto pt-3 border-t border-border/60 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                {/* Metadatos: Frecuencia y Fecha de Inicio */}
+                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 py-2.5 px-3 rounded-lg bg-neutral-500/5 mb-4">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-blue-500" />
-                    <Badge
-                      variant="dot"
-                      color={getPeriodColor(loan.period)}
-                      size="sm"
-                      className="capitalize"
-                    >
+                    <span className="capitalize font-medium text-foreground">
                       {loan.period}
-                    </Badge>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                    <span>
+                      {paidInterestsCount}/{totalInterestsCount || 0} cuotas
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
@@ -254,20 +247,57 @@ function LoansCard({ loans }: LoansCardProps) {
                     <span>{formatDate(loan.paymentDate)}</span>
                   </div>
                 </div>
+
+                {/* Acciones: Ver más y Abonar Capital */}
+                <div className="flex flex-col md:flex-row gap-5 pt-4 border-t border-border/60">
+                  <Button
+                    variant="transparent"
+                    color="var(--bg-active)"
+                    fullWidth
+                    size="xs"
+                    radius="md"
+                    leftSection={<Coins className="w-3.5 h-3.5" />}
+                    onClick={() => handleOpenModal(loan)}
+                  >
+                    Ver más
+                  </Button>
+
+                  {!isPaid && (
+                    <Button
+                      variant="transparent"
+                      color="var(--amber)"
+                      size="xs"
+                      fullWidth
+                      radius="md"
+                      disabled={isPaid}
+                      leftSection={<Wallet className="w-3.5 h-3.5" />}
+                      className="text-amber hover:bg-amber/10 transition-colors font-medium"
+                      onClick={() => handleOpenCapital(loan)}
+                    >
+                      Abonar Capital
+                    </Button>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
       </div>
+
       <ModalDelete
         opened={openedDelete}
         close={handleCloseDelete}
         id={selectedId}
       />
-      <ModalInterests
-        opened={openedInterests}
-        close={handleCloseInterests}
-        loan={activeLoanForInterests}
+      <ModalLoans
+        opened={openedModal}
+        close={handleCloseModal}
+        loan={activeLoan}
+      />
+      <ModalPayCapital
+        opened={openedCapital}
+        close={handleCloseCapital}
+        loan={activeCapitalLoan}
       />
     </>
   );

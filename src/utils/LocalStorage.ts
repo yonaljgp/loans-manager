@@ -14,7 +14,7 @@ function syncLoansWithCurrentDate(loans: LoanType[]): {
   let hasChanges = false;
   const syncedLoans = loans.map((loan) => {
     // Si el préstamo ya está completamente pagado, no generamos nuevas cuotas de interés
-    if (loan.status === "pagado") {
+    if (loan.status === "Pagado") {
       return loan;
     }
 
@@ -214,6 +214,31 @@ function addNextInterestWeek(loanId: number): LoanType | null {
   return updatedLoan;
 }
 
+/**
+ * Registra un abono al capital de un préstamo y actualiza su saldo/estado.
+ */
+function payLoanCapital(loanId: number, amount: number): LoanType | null {
+  if (typeof window === "undefined" || amount <= 0) return null;
+  const loan = get("loans", loanId);
+  if (!loan) return null;
+
+  const currentPaid = loan.principalPayment || 0;
+  const newPrincipalPayment = Math.min(
+    loan.capitalAmount,
+    currentPaid + amount,
+  );
+  const isFullyPaid = newPrincipalPayment >= loan.capitalAmount;
+
+  const updatedLoan: LoanType = {
+    ...loan,
+    principalPayment: newPrincipalPayment,
+    status: isFullyPaid ? "Pagado" : loan.status,
+  };
+
+  updateLoan("loans", updatedLoan);
+  return updatedLoan;
+}
+
 export {
   getAll,
   get,
@@ -222,6 +247,7 @@ export {
   updateLoan,
   toggleInterestPaid,
   addNextInterestWeek,
+  payLoanCapital,
   getLoansSnapshot,
   subscribeLoans,
 };

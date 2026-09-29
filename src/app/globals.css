@@ -9,8 +9,10 @@
   --bg: #f7f7f7;
   --fg: #2d2d2d;
   --bg-card: #ffffff;
-  --bg-active: #1e90ff;
+  --bg-active: #0969da;
   --border: #e0e0e0;
+  --amber: #d97706;
+  --red: #dc2626;
 
   /* Sincronización con Mantine */
   --mantine-color-body: var(--bg);
@@ -25,6 +27,8 @@
   --bg-card: #121212;
   --bg-active: #1e90ff;
   --border: #222222;
+  --amber: #fbbf24;
+  --red: #dc2626;
 
   /* Sincronización con Mantine */
   --mantine-color-body: var(--bg);
@@ -39,6 +43,8 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-bg-active: var(--bg-active);
+  --color-amber: var(--amber);
+  --color-red: var(--red);
 }
 
 body {
@@ -140,6 +146,18 @@ body {
 .mantine-Input-input:focus-within {
   border-color: var(--bg-active);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg-active) 20%, transparent);
+}
+
+.input-white:focus,
+.input-white:focus-visible,
+.input-white:focus-within,
+.mantine-Input-input.input-white:focus,
+.mantine-Input-input.input-white:focus-within,
+.mantine-NumberInput-input.input-white:focus,
+.mantine-NumberInput-input.input-white:focus-within {
+  border-color: #ffffff !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .input:disabled,
