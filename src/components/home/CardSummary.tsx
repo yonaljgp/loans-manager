@@ -21,7 +21,7 @@ function CardSummary({ loans }: Props) {
     0,
   );
 
-  const pendingLoans = loans.filter((l) => l.status !== "pagado");
+  const pendingLoans = loans.filter((l) => l.status !== "Pagado");
   const totalPending = pendingLoans.reduce(
     (acc, loan) => acc + (loan.capitalAmount || 0),
     0,
@@ -31,7 +31,7 @@ function CardSummary({ loans }: Props) {
     0,
   );
 
-  const paidLoans = loans.filter((l) => l.status === "pagado");
+  const paidLoans = loans.filter((l) => l.status === "Pagado");
   const totalInterestsPending = pendingLoans.reduce((acc, loan) => {
     const loanPendingAmount = (loan.interests || []).reduce(
       (sum, interest) => (!interest.paid ? sum + (interest.amount || 0) : sum),

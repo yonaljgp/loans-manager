@@ -59,11 +59,6 @@ function ModalPayCapital({ loan, opened, close }: ModalPayCapitalProps) {
   const newRemainingCapital = Math.max(0, remainingCapital - numAmount);
   const isLiquidation = numAmount >= remainingCapital && remainingCapital > 0;
 
-  // Cálculo de nuevos intereses proyectados tras el abono
-  const currentInterestPerPeriod = calculateInterestAmount(
-    remainingCapital,
-    loan.interestPercentage || 0,
-  );
   const newInterestPerPeriod = calculateInterestAmount(
     newRemainingCapital,
     loan.interestPercentage || 0,

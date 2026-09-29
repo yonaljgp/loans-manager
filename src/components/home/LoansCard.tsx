@@ -124,7 +124,7 @@ function LoansCard({ loans }: LoansCardProps) {
       <div className="w-full max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {loans.map((loan) => {
-            const isPaid = loan.status === "pagado";
+            const isPaid = loan.status === "Pagado";
             const interests = loan.interests ?? [];
             const paidInterestsCount = interests.filter((i) => i.paid).length;
             const totalInterestsCount = interests.length;
