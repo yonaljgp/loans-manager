@@ -141,7 +141,7 @@ function LoansForm() {
               maxDate={new Date()}
               locale="es"
               required
-              value={field.value ? new Date(field.value) : null}
+              value={field.value ? new Date(`${field.value}T00:00:00`) : null}
               onChange={(date) => {
                 if (!date) {
                   field.onChange("");
