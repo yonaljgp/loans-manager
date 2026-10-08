@@ -1,6 +1,8 @@
 import { Badge, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { Wallet, Clock, CheckCircle2, TrendingUp } from "lucide-react";
 import type { LoanType } from "@/types/LoansType";
+import ModalPendingInterest from "./ModalPendingInterest";
 
 interface Props {
   loans: LoanType[];
@@ -40,6 +42,8 @@ function CardSummary({ loans }: Props) {
     return acc + loanPendingAmount;
   }, 0);
 
+  const [opened, { open, close }] = useDisclosure(false);
+
   const stats = [
     {
       title: "Capital Prestado",
@@ -71,11 +75,12 @@ function CardSummary({ loans }: Props) {
       subtitle: `${totalInstallmentsPending} Cuotas Pendientes`,
       icon: CheckCircle2,
       badgeText: `${paidLoans.length} saldados`,
-      badgeColor: "blue",
-      colorClass: "text-bg-active",
-      bgClass: "bg-bg-active/10",
-      borderClass: "border-bg-active/20",
-      hoverBorder: "hover:border-bg-active/50",
+      badgeColor: "amber",
+      colorClass: "text-amber",
+      bgClass: "bg-amber/10",
+      borderClass: "border-amber/20",
+      hoverBorder: "hover:border-amber/50",
+      onClick: () => open(),
     },
   ];
 
@@ -88,6 +93,7 @@ function CardSummary({ loans }: Props) {
             <div
               key={index}
               className={`card group relative flex flex-col justify-between p-5 md:p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg ${item.hoverBorder}`}
+              onClick={item.onClick}
             >
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
@@ -127,6 +133,11 @@ function CardSummary({ loans }: Props) {
           );
         })}
       </div>
+      <ModalPendingInterest
+        opened={opened}
+        handleClose={close}
+        pendingInterest={pendingLoans}
+      />
     </div>
   );
 }
