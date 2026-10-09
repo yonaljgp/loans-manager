@@ -83,9 +83,7 @@ function LoansForm() {
               suffix="$"
               hideControls
               value={field.value}
-              onChange={(val) =>
-                field.onChange(typeof val === "number" ? val : 0)
-              }
+              onChange={(val) => field.onChange(Number(val))}
               min={0}
             />
           )}
@@ -103,9 +101,7 @@ function LoansForm() {
               suffix="%"
               hideControls
               value={field.value}
-              onChange={(val) =>
-                field.onChange(typeof val === "number" ? val : 0)
-              }
+              onChange={(val) => field.onChange(Number(val))}
               min={0}
               max={100}
             />

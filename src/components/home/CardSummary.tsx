@@ -25,7 +25,8 @@ function CardSummary({ loans }: Props) {
 
   const pendingLoans = loans.filter((l) => l.status !== "Pagado");
   const totalPending = pendingLoans.reduce(
-    (acc, loan) => acc + (loan.capitalAmount || 0),
+    (acc, loan) =>
+      acc + ((loan.capitalAmount || 0) - (loan.principalPayment || 0)),
     0,
   );
   const totalInstallmentsPending = pendingLoans.reduce(
@@ -34,13 +35,16 @@ function CardSummary({ loans }: Props) {
   );
 
   const paidLoans = loans.filter((l) => l.status === "Pagado");
-  const totalInterestsPending = pendingLoans.reduce((acc, loan) => {
-    const loanPendingAmount = (loan.interests || []).reduce(
-      (sum, interest) => (!interest.paid ? sum + (interest.amount || 0) : sum),
-      0,
-    );
-    return acc + loanPendingAmount;
-  }, 0);
+  const totalInterestsPending = pendingLoans.reduce(
+    (sum, loan) =>
+      sum +
+      (loan.interests || []).reduce(
+        (acc, interest) =>
+          !interest.paid ? acc + (interest.amount || 0) : acc,
+        0,
+      ),
+    0,
+  );
 
   const [opened, { open, close }] = useDisclosure(false);
 

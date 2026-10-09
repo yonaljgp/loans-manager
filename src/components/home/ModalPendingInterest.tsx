@@ -37,7 +37,11 @@ function ModalPendingInterest({
   handleClose,
   pendingInterest,
 }: ModalPendingInterestProps) {
-  const grandTotal = pendingInterest.reduce(
+  const overdueInterests = pendingInterest.filter((l) =>
+    l.interests?.some((i) => !i.paid),
+  );
+
+  const grandTotal = overdueInterests.reduce(
     (acc, loan) => acc + totalAmountInterests(loan.interests ?? []),
     0,
   );
@@ -105,25 +109,18 @@ function ModalPendingInterest({
         {/* Loan list */}
         <ScrollArea h={340} pr={4}>
           <div className="flex flex-col gap-2.5">
-            {pendingInterest.length === 0 ? (
-              <div className="text-center py-10 text-sm text-neutral-500">
+            {overdueInterests.length === 0 ? (
+              <div className="flex justify-center py-10 text-md font-semibold text-neutral-500">
                 No hay intereses vencidos 🎉
               </div>
             ) : (
-              pendingInterest.map((loan) => {
+              overdueInterests.map((loan) => {
                 const pendingAmount = totalAmountInterests(
                   loan.interests ?? [],
                 );
                 const pendingCount = totalInstallmentsPending(
                   loan.interests ?? [],
                 );
-                const totalCount = totalInstallments(loan.interests ?? []);
-                const paidCount = totalCount - pendingCount;
-                const progressPct =
-                  totalCount > 0
-                    ? Math.round((paidCount / totalCount) * 100)
-                    : 0;
-
                 return (
                   <div
                     key={loan.id}
@@ -148,7 +145,7 @@ function ModalPendingInterest({
 
                       {/* Pending amount */}
                       <div className="text-right">
-                        <span className="text-sm font-bold text-amber block">
+                        <span className="text-sm font-bold text-amber block mr-2">
                           {formatCurrency(pendingAmount)}
                         </span>
                         <Badge
